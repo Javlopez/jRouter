@@ -39,26 +39,15 @@ func New() *JRouter {
 
 //Handle method is to create routes from handlers
 func (jr *JRouter) Handle(pattern string, handler Handler, methods string) error {
+	var currentMethods []string
 	//re := regexp.MustCompile(pattern)
-	methodsParsed, err := buildMethods(methods)
-	if err != nil {
-		return err
+	if _, ok := jr.Routes[pattern]; ok {
+		currentMethods = jr.Routes[pattern].Methods
 	}
 
-	//fmt.Printf("[Routes Map: %#v]\n", jr.Routes[pattern])
-	if _, ok := jr.Routes[pattern]; ok {
-		currentMethods := jr.Routes[pattern].Methods
-		for _, mp := range methodsParsed {
-			methodFound := false
-			for _, m := range currentMethods {
-				if m == mp {
-					methodFound = true
-				}
-			}
-			if !methodFound {
-				methodsParsed = append(currentMethods, mp)
-			}
-		}
+	methodsParsed, err := buildMethods(currentMethods, methods)
+	if err != nil {
+		return err
 	}
 
 	route := Route{Pattern: pattern, Handler: handler, Methods: methodsParsed}
@@ -76,22 +65,29 @@ func methodIsAllowed(method string) bool {
 	return false
 }
 
-func buildMethods(methods string) ([]string, error) {
-	var methodsParsed []string
-	if !strings.Contains(methods, ",") {
-		if !methodIsAllowed(methods) {
-			return methodsParsed, MethodIsNotAllowedError
+func compileMethods(currentMethods []string, method string) []string {
+	for _, m := range currentMethods {
+		if m == method {
+			return currentMethods
 		}
-		methodsParsed = append(methodsParsed, methods)
-		return methodsParsed, nil
+	}
+	return append(currentMethods, method)
+}
+
+//GET,
+func buildMethods(currentMethods []string, methods string) ([]string, error) {
+	var methodsParsed []string
+	methodsList := strings.Split(methods, ",")
+
+	if !strings.Contains(methods, ",") {
+		methodsList = []string{methods}
 	}
 
-	methodsList := strings.Split(methods, ",")
 	for _, method := range methodsList {
 		if !methodIsAllowed(method) {
 			return methodsParsed, MethodIsNotAllowedError
 		}
-		methodsParsed = append(methodsParsed, method)
+		methodsParsed = compileMethods(methodsParsed, method)
 	}
 
 	return methodsParsed, nil

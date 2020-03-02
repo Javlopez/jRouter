@@ -37,8 +37,8 @@ func main(){
     jr.Handle("/some-end-point", HandlerSimpleSample, "GET")
     err := http.ListenAndServe(portNumber, jr)
     if err != nil {
-		log.Fatalf("Could not start server: %s\n", err.Error())
-	}
+        log.Fatalf("Could not start server: %s\n", err.Error())
+    }
 }
 
 func HandlerSimpleSample(w http.ResponseWriter, r *http.Request) {

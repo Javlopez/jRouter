@@ -8,7 +8,7 @@ import (
 
 var MethodIsNotAllowedError = errors.New("The method is not allowed")
 
-var AllowedMethods = []string{
+var DefaultMethodsAllowed = []string{
 	http.MethodGet,
 	http.MethodPost,
 	http.MethodPut,
@@ -17,19 +17,22 @@ var AllowedMethods = []string{
 
 //MethodBuilder struct
 type MethodBuilder struct {
-	methods []string
+	methods        []string
+	methodsAllowed []string
 }
 
 //NewMethodBuilder func
-func NewMethodBuilder(methods []string) *MethodBuilder {
-	return &MethodBuilder{methods: methods}
+func NewMethodBuilder(methodsBase, methodsAllowed []string) *MethodBuilder {
+	if methodsAllowed == nil {
+		methodsAllowed = DefaultMethodsAllowed
+	}
+	return &MethodBuilder{methods: methodsBase, methodsAllowed: methodsAllowed}
 }
 
 //Add method
 func (mb *MethodBuilder) Add(methods string) (*MethodBuilder, error) {
-	//var methodsParsed []string
-	methodsList := strings.Split(methods, ",")
 
+	methodsList := strings.Split(methods, ",")
 	if !strings.Contains(methods, ",") {
 		methodsList = []string{methods}
 	}
@@ -37,7 +40,7 @@ func (mb *MethodBuilder) Add(methods string) (*MethodBuilder, error) {
 	for _, method := range methodsList {
 
 		method = strings.TrimSpace(method)
-		if !mb.methodIsAllowed(method) {
+		if !mb.MethodIsAllowed(method) {
 			return mb, MethodIsNotAllowedError
 		}
 		mb.methods = mb.compileMethods(mb.methods, method)
@@ -45,8 +48,9 @@ func (mb *MethodBuilder) Add(methods string) (*MethodBuilder, error) {
 	return mb, nil
 }
 
-func (mb *MethodBuilder) methodIsAllowed(method string) bool {
-	for _, methodAllowed := range AllowedMethods {
+//MethodIsAllowed method
+func (mb *MethodBuilder) MethodIsAllowed(method string) bool {
+	for _, methodAllowed := range mb.methodsAllowed {
 		if methodAllowed == method {
 			return true
 		}
@@ -63,6 +67,7 @@ func (mb *MethodBuilder) compileMethods(currentMethods []string, method string) 
 	return append(currentMethods, method)
 }
 
+//Methods method
 func (mb *MethodBuilder) Methods() []string {
 	return mb.methods
 }

@@ -1,6 +1,7 @@
 package jrouter
 
 import (
+	"fmt"
 	"net/http"
 	"testing"
 
@@ -10,7 +11,6 @@ import (
 func HandlerSimpleSample(http.ResponseWriter, *http.Request) {}
 
 func TestGeneralRouter(t *testing.T) {
-
 	t.Run("Should be able to run new Router instance using New function", func(t *testing.T) {
 		jr := New()
 		assert.IsType(t, &JRouter{}, jr)
@@ -20,12 +20,12 @@ func TestGeneralRouter(t *testing.T) {
 		jr := New()
 		jr.Handle("/some-end-point", HandlerSimpleSample, "POST")
 		assert.IsType(t, &JRouter{}, jr)
-		assert.Equal(t, len(jr.Routes), 1)
+		assert.Equal(t, 1, len(jr.Routes))
 	})
 	t.Run("Should reject the boostrap if the method is not allowd", func(t *testing.T) {
 		jr := New()
 		err := jr.Handle("/some-end-point", HandlerSimpleSample, "InvalidMethod")
-		assert.Equal(t, len(jr.Routes), 0)
+		assert.Equal(t, 0, len(jr.Routes))
 		assert.EqualError(t, err, "The method is not allowed")
 	})
 
@@ -36,15 +36,19 @@ func TestGeneralRouter(t *testing.T) {
 		jr.Handle("/some-end-point", HandlerSimpleSample, "PUT")
 
 		assert.IsType(t, &JRouter{}, jr)
-		assert.Equal(t, len(jr.Routes), 1)
+		assert.Equal(t, 1, len(jr.Routes))
 	})
 
 	t.Run("Should be able to support different methods", func(t *testing.T) {
 		jr := New()
 		jr.Handle("/some-end-point", HandlerSimpleSample, "POST,GET")
+		jr.Handle("/end-point", HandlerSimpleSample, "POST,GET, DELETE")
+		jr.Handle("/end-point", HandlerSimpleSample, "POST, PUT, DELETE")
 
+		fmt.Printf("Routes %#v", jr.Routes)
 		assert.IsType(t, &JRouter{}, jr)
-		assert.Equal(t, 1, len(jr.Routes))
-		assert.Equal(t, len(jr.Routes["/some-end-point"].Methods), 2)
+		assert.Equal(t, 2, len(jr.Routes))
+		assert.Equal(t, 2, len(jr.Routes["/some-end-point"].Methods))
+		assert.Equal(t, 4, len(jr.Routes["/end-point"].Methods))
 	})
 }

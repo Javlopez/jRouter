@@ -1,4 +1,4 @@
 language: go
 
 before_install:
-  - go get -v github.com/stretchr/testify/assert"
+  - go get -v github.com/stretchr/testify/assert

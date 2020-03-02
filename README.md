@@ -8,7 +8,7 @@
 
 JRouter is another attemp to make easy the developers life, jrouter is trying to be simple, fast and easy Go http router.
 
-I have started so please take a look, give me a feedback and open any issue that you have with this router.
+I have started this project recently so please take a look, give me any feedback and open any issue that you have with this router.
 
 Requeriments:
 
@@ -29,7 +29,7 @@ package main
 import (
     "github.com/Javlopez/jrouter"
     "log"
-	"net/http"
+    "net/http"
 )
 
 func main(){
@@ -46,14 +46,4 @@ func HandlerSimpleSample(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("Hello world"))
 }
 ```
-
-// /something/
-// /something/{:data}
-// /something/{:id}/
-// /something/{:user}/
-// /something/{user:number}/
-// /something/{user:string}/
-// /something/{user:list{1,2,3,4,5}}/
-// /something/{user:regex("\d+")}/
-
 

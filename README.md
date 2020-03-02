@@ -36,7 +36,7 @@ func main(){
     jr := New()
     jr.Handle("/some-end-point", HandlerSimpleSample, "GET")
     err := http.ListenAndServe(portNumber, jr)
-    	if err != nil {
+    if err != nil {
 		log.Fatalf("Could not start server: %s\n", err.Error())
 	}
 }

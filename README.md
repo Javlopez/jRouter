@@ -35,7 +35,7 @@ import (
 func main(){
     jr := New()
     jr.Handle("/some-end-point", HandlerSimpleSample, "GET")
-    err := http.ListenAndServe(portNumber, jr)
+    err := http.ListenAndServe(":8080", jr)
     if err != nil {
         log.Fatalf("Could not start server: %s\n", err.Error())
     }
@@ -46,5 +46,14 @@ func HandlerSimpleSample(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("Hello world"))
 }
 ```
+
+// /something/
+// /something/{:data}
+// /something/{:id}/
+// /something/{:user}/
+// /something/{user:number}/
+// /something/{user:string}/
+// /something/{user:list{1,2,3,4,5}}/
+// /something/{user:regex("\d+")}/
 
 

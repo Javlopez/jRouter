@@ -8,7 +8,10 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func HandlerSimpleSample(http.ResponseWriter, *http.Request) {}
+func HandlerSimpleSample(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("Hello world"))
+}
 
 func TestGeneralRouter(t *testing.T) {
 	t.Run("Should be able to run new Router instance using New function", func(t *testing.T) {

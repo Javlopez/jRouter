@@ -73,9 +73,7 @@ func TestGeneralRouter(t *testing.T) {
 		jr.Handle("/some-end-point", HandlerSimpleSample, "POST")
 		r := httptest.NewRequest("GET", "/some-end-point", nil)
 		w := httptest.NewRecorder()
-		err := jr.ServeHTTP(w, r)
-
-		assert.EqualError(t, err, "http.StatusMethodNotAllowed")
+		jr.ServeHTTP(w, r)
 		if status := w.Code; status != http.StatusMethodNotAllowed {
 			t.Errorf("Status code differs. Expected %d .\n Got %d instead", http.StatusMethodNotAllowed, status)
 		}
@@ -86,9 +84,8 @@ func TestGeneralRouter(t *testing.T) {
 		jr.Handle("/some-end-point", HandlerSimpleSample, "GET")
 		r := httptest.NewRequest("GET", "/some-end-point", nil)
 		w := httptest.NewRecorder()
-		err := jr.ServeHTTP(w, r)
+		jr.ServeHTTP(w, r)
 
-		assert.Nil(t, err)
 		if status := w.Code; status != http.StatusOK {
 			t.Errorf("Status code differs. Expected %d .\n Got %d instead", http.StatusOK, status)
 		}
@@ -99,9 +96,8 @@ func TestGeneralRouter(t *testing.T) {
 		jr.Handle("/some-end-point/{id}/{name}", HandlerWithIdentifierSample, "GET")
 		r := httptest.NewRequest("GET", "/some-end-point/1523/javier", nil)
 		w := httptest.NewRecorder()
-		err := jr.ServeHTTP(w, r)
+		jr.ServeHTTP(w, r)
 
-		assert.Nil(t, err)
 		assert.Equal(t, "Hello world {id:1523, name:javier}", w.Body.String())
 		if status := w.Code; status != http.StatusOK {
 			t.Errorf("Status code differs. Expected %d .\n Got %d instead", http.StatusOK, status)

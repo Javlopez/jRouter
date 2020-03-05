@@ -22,8 +22,7 @@ func TestContext(t *testing.T) {
 		r := httptest.NewRequest("GET", "/some-end-point/1", nil)
 		Write(r, "id", 1)
 		w := httptest.NewRecorder()
-		err := jr.ServeHTTP(w, r)
-		assert.Nil(t, err)
+		jr.ServeHTTP(w, r)
 		assert.Equal(t, "Hello world 1", w.Body.String())
 		assert.Equal(t, "1", Read(r, "id"))
 		if status := w.Code; status != http.StatusOK {

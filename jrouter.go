@@ -53,15 +53,15 @@ func (jr *JRouter) Handle(pattern string, handler Handler, methods string) error
 	return nil
 }
 
-func (jr *JRouter) ServeHTTP(w http.ResponseWriter, r *http.Request) error {
+func (jr *JRouter) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	jr.context = &Context{Request: r, ResponseWriter: w}
 	err := jr.dispatcher(r)
 	if err != nil {
 		w.WriteHeader(http.StatusMethodNotAllowed)
-		return err
+		//return err
 	}
 
-	return nil
+	//return nil
 
 }
 

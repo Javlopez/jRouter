@@ -47,3 +47,4 @@ func HandlerSimpleSample(w http.ResponseWriter, r *http.Request) {
 }
 ```
 
+For more adavanced usage please take a look examples/ folder

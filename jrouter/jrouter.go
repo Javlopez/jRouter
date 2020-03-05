@@ -3,7 +3,6 @@ package jrouter
 import (
 	"errors"
 	"net/http"
-	"regexp"
 )
 
 //Handler is a type able to manage custom handler keeping http.ResponseWriter, *http.Request
@@ -23,7 +22,7 @@ type JRouter struct {
 
 //Route struct
 type Route struct {
-	Pattern *regexp.Regexp
+	Pattern string
 	Handler Handler
 	Methods []string
 }
@@ -38,7 +37,7 @@ func New() *JRouter {
 //Handle method is to create routes from handlers
 func (jr *JRouter) Handle(pattern string, handler Handler, methods string) error {
 	var currentMethods []string
-	re := regexp.MustCompile(pattern)
+	//re := regexp.MustCompile(pattern)
 	if _, ok := jr.Routes[pattern]; ok {
 		currentMethods = jr.Routes[pattern].Methods
 	}
@@ -49,14 +48,14 @@ func (jr *JRouter) Handle(pattern string, handler Handler, methods string) error
 		return err
 	}
 
-	route := Route{Pattern: re, Handler: handler, Methods: mb.Methods()}
+	route := Route{Pattern: pattern, Handler: handler, Methods: mb.Methods()}
 	jr.Routes[pattern] = route
 	return nil
 }
 
 func (jr *JRouter) ServeHTTP(w http.ResponseWriter, r *http.Request) error {
 	jr.context = &Context{Request: r, ResponseWriter: w}
-	err := jr.dispatcher()
+	err := jr.dispatcher(r)
 	if err != nil {
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		return err
@@ -66,9 +65,19 @@ func (jr *JRouter) ServeHTTP(w http.ResponseWriter, r *http.Request) error {
 
 }
 
-func (jr *JRouter) dispatcher() error {
+func (jr *JRouter) dispatcher(r *http.Request) error {
 	for _, rt := range jr.Routes {
-		if matches := rt.Pattern.FindStringSubmatch(jr.context.URL.Path); len(matches) > 0 {
+		uParser := NewURLParser()
+		uParser.Analyze(rt.Pattern)
+
+		if matches := uParser.PatternMatcher.FindStringSubmatch(jr.context.URL.Path); len(matches) > 0 {
+
+			parameters := matches[1:]
+			if parameters != nil {
+				for i, p := range uParser.Params {
+					Write(r, p.Param, parameters[i])
+				}
+			}
 
 			mb := NewMethodBuilder(nil, rt.Methods)
 			if !mb.MethodIsAllowed(jr.context.Method) {

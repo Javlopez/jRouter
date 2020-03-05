@@ -1,6 +1,7 @@
 package jrouter
 
 import (
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -92,4 +93,25 @@ func TestGeneralRouter(t *testing.T) {
 			t.Errorf("Status code differs. Expected %d .\n Got %d instead", http.StatusOK, status)
 		}
 	})
+
+	t.Run("Should be able to parse identifiers", func(t *testing.T) {
+		jr := New()
+		jr.Handle("/some-end-point/{id}/{name}", HandlerWithIdentifierSample, "GET")
+		r := httptest.NewRequest("GET", "/some-end-point/1523/javier", nil)
+		w := httptest.NewRecorder()
+		err := jr.ServeHTTP(w, r)
+
+		assert.Nil(t, err)
+		assert.Equal(t, "Hello world {id:1523, name:javier}", w.Body.String())
+		if status := w.Code; status != http.StatusOK {
+			t.Errorf("Status code differs. Expected %d .\n Got %d instead", http.StatusOK, status)
+		}
+	})
+}
+
+func HandlerWithIdentifierSample(w http.ResponseWriter, r *http.Request) {
+	id := Read(r, "id")
+	name := Read(r, "name")
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte(fmt.Sprintf("Hello world {id:%s, name:%s}", id, name)))
 }

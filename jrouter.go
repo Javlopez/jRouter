@@ -53,6 +53,31 @@ func (jr *JRouter) Handle(pattern string, handler Handler, methods string) error
 	return nil
 }
 
+//Get method handle GET method
+func (jr *JRouter) Get(pattern string, handler Handler) error {
+	return jr.Handle(pattern, handler, http.MethodGet)
+}
+
+//Post method handle POST method
+func (jr *JRouter) Post(pattern string, handler Handler) error {
+	return jr.Handle(pattern, handler, http.MethodPost)
+}
+
+//Put method handle PUT method
+func (jr *JRouter) Put(pattern string, handler Handler) error {
+	return jr.Handle(pattern, handler, http.MethodPut)
+}
+
+//Delete method handle DELETE method
+func (jr *JRouter) Delete(pattern string, handler Handler) error {
+	return jr.Handle(pattern, handler, http.MethodDelete)
+}
+
+//Patch method handle PATCH method
+func (jr *JRouter) Patch(pattern string, handler Handler) error {
+	return jr.Handle(pattern, handler, http.MethodPatch)
+}
+
 func (jr *JRouter) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	jr.context = &Context{Request: r, ResponseWriter: w}
 	err := jr.dispatcher(r)

@@ -111,3 +111,49 @@ func HandlerWithIdentifierSample(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte(fmt.Sprintf("Hello world {id:%s, name:%s}", id, name)))
 }
+
+func TestMethodsWithSyntacticSugar(t *testing.T) {
+	for _, tc := range []struct {
+		Title          string
+		Method         string
+		MethodExpected string
+	}{
+		{Title: "Should return GET Method", Method: http.MethodGet, MethodExpected: http.MethodGet},
+		{Title: "Should return POST Method", Method: http.MethodPost, MethodExpected: http.MethodPost},
+		{Title: "Should return PUT Method", Method: http.MethodPut, MethodExpected: http.MethodPut},
+		{Title: "Should return DELETE Method", Method: http.MethodDelete, MethodExpected: http.MethodDelete},
+		{Title: "Should return PATCH Method", Method: http.MethodPatch, MethodExpected: http.MethodPatch},
+	} {
+		t.Run(tc.Title, func(t *testing.T) {
+			jr := New()
+
+			switch tc.Method {
+			case http.MethodGet:
+				jr.Get("something", HandlerWithSyntacticSugar)
+			case http.MethodPost:
+				jr.Post("something", HandlerWithSyntacticSugar)
+			case http.MethodPut:
+				jr.Put("something", HandlerWithSyntacticSugar)
+			case http.MethodDelete:
+				jr.Delete("something", HandlerWithSyntacticSugar)
+			case http.MethodPatch:
+				jr.Patch("something", HandlerWithSyntacticSugar)
+			}
+
+			r := httptest.NewRequest(tc.Method, "/something", nil)
+			w := httptest.NewRecorder()
+			jr.ServeHTTP(w, r)
+
+			assert.Equal(t, tc.MethodExpected, w.Body.String())
+			if status := w.Code; status != http.StatusOK {
+				t.Errorf("Status code differs. Expected %d .\n Got %d instead", http.StatusOK, status)
+			}
+		})
+	}
+}
+
+func HandlerWithSyntacticSugar(w http.ResponseWriter, r *http.Request) {
+	m := r.Method
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte(m))
+}

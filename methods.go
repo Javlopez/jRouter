@@ -13,6 +13,7 @@ var DefaultMethodsAllowed = []string{
 	http.MethodPost,
 	http.MethodPut,
 	http.MethodDelete,
+	http.MethodPatch,
 }
 
 //MethodBuilder struct
